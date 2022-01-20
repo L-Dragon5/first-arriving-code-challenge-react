@@ -1,5 +1,7 @@
+import { MoonIcon, SunIcon } from '@chakra-ui/icons';
 import {
   Box,
+  Center,
   Container,
   Flex,
   Grid,
@@ -11,6 +13,8 @@ import {
   Link,
   Spinner,
   Text,
+  useBreakpointValue,
+  useToast,
   VStack,
 } from '@chakra-ui/react';
 import axios from 'axios';
@@ -32,6 +36,18 @@ function App() {
   const [forecastTimeZone, setForecastTimeZone] = useState('America/New_York'); // Forecast timezone.
   const [forecastInfo, setForecastInfo] = useState(null); // Forecast information to display
 
+  const toast = useToast(); // Creating toast popups.
+
+  const periodsColumns = useBreakpointValue({
+    base: '1fr 1fr',
+    md: '120px 60px 1fr 0.25fr',
+  });
+
+  const periodsRows = useBreakpointValue({
+    base: '60px 1fr',
+    md: '1fr',
+  });
+
   // Send request to node server to get coordinates.
   // (This was needed to bypass CORS issue with geocoder)
   const geocodeAddress = () => {
@@ -40,25 +56,6 @@ function App() {
         address: addressInput,
       })
       .then((response) => setAddressCoords(response.data));
-  };
-
-  // Retrieve weather station information based on coordinates.
-  // Uses forecast url from weather station for forecast information.
-  const retrieveWeatherStation = () => {
-    // Retrieve weather station information.
-    if (addressCoords.latitude && addressCoords.longitude) {
-      axios
-        .get(
-          `https://api.weather.gov/points/${addressCoords.latitude},${addressCoords.longitude}`,
-        )
-        .then((response) => {
-          const { forecastHourly, timeZone } = response.data.properties;
-
-          setForecastUrl(forecastHourly);
-          setForecastTimeZone(timeZone);
-        })
-        .catch((error) => console.error(error));
-    }
   };
 
   // Retrieve forecast information from URL based on address.
@@ -105,6 +102,31 @@ function App() {
       });
   };
 
+  // Retrieve weather station information based on coordinates.
+  // Uses forecast url from weather station for forecast information.
+  const retrieveWeatherStation = () => {
+    // Retrieve weather station information.
+    if (addressCoords.latitude && addressCoords.longitude) {
+      axios
+        .get(
+          `https://api.weather.gov/points/${addressCoords.latitude},${addressCoords.longitude}`,
+        )
+        .then((response) => {
+          const { forecastHourly, timeZone } = response.data.properties;
+
+          // If it's the same as the existing url, just retrieve manually.
+          // If not, set forecast url and timezone.
+          if (forecastUrl === forecastHourly) {
+            retrieveForecast();
+          } else {
+            setForecastUrl(forecastHourly);
+            setForecastTimeZone(timeZone);
+          }
+        })
+        .catch((error) => console.error(error));
+    }
+  };
+
   // Submit address for geocoding.
   const submitAddress = (e) => {
     e.preventDefault();
@@ -127,17 +149,28 @@ function App() {
   useEffect(() => {
     const interval = setInterval(() => {
       retrieveForecast();
+
+      // Send notification that forecast data has been refreshed.
+      toast({
+        title: 'Forecast refreshed.',
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
     }, 600000);
 
     return () => clearInterval(interval); // Unmount interval.
   }, []);
 
   return (
-    <Flex direction="column" minHeight="100vh">
-      <Flex direction="column" flexGrow="1" flexShrink="0" p={3}>
+    <Grid templateRows="0.35fr auto 50px" height="100vh">
+      <GridItem as={Flex} direction="column" flexGrow="1" flexShrink="0" p={3}>
         <Container maxW="container.md" centerContent>
-          <Heading as="h1" size="xl" mb={3}>
+          <Heading as="h1" size="xl" mb={1}>
             Tomorrow&apos;s Weather Forecast
+          </Heading>
+          <Heading as="h4" size="sm" mb={3}>
+            24-hour time period from 6am to 6am
           </Heading>
 
           <form style={{ width: '100%' }} onSubmit={submitAddress}>
@@ -149,54 +182,73 @@ function App() {
             />
           </form>
         </Container>
+      </GridItem>
 
-        <Box mt={6}>
-          {!isLoading && forecastInfo ? (
-            <Container maxW="container.lg">
-              <VStack alignItems="flex-start" spacing={5}>
-                {forecastInfo.map((period) => (
+      <GridItem mt={6} overflow="auto">
+        {!isLoading && forecastInfo ? (
+          <Container maxW="container.lg">
+            <VStack alignItems="flex-start" spacing={5}>
+              {forecastInfo.map((period) => {
+                const periodTime = DateTime.fromISO(period.startTime);
+
+                return (
                   <Grid
                     key={period.number}
-                    templateColumns="0.35fr 1fr 0.25fr"
-                    gap={6}
-                    p={4}
+                    templateColumns={periodsColumns}
+                    templateRows={periodsRows}
+                    gap={4}
+                    px={4}
+                    py={2}
                     width="full"
-                    bgColor="gray.100"
+                    bgColor={period.isDaytime ? 'gray.100' : 'gray.300'}
                     alignItems="center"
                     borderRadius="sm"
                   >
                     <GridItem>
-                      <Text>
-                        {DateTime.fromISO(period.startTime).toLocaleString(
-                          DateTime.DATETIME_FULL,
-                        )}
+                      <Text fontWeight="bold" fontSize="md">
+                        {periodTime.toLocaleString(DateTime.DATE_SHORT)}
+                      </Text>
+                      <Text fontSize="2xl">
+                        {periodTime.toLocaleString(DateTime.TIME_SIMPLE)}
                       </Text>
                     </GridItem>
+
+                    <GridItem>
+                      {period.isDaytime ? (
+                        <SunIcon boxSize={10} />
+                      ) : (
+                        <MoonIcon boxSize={10} />
+                      )}
+                    </GridItem>
+
                     <GridItem as={HStack}>
                       <Image src={period.icon} boxSize="84px" />
-                      <Text>{period.shortForecast}</Text>
+                      <Text fontSize="lg">{period.shortForecast}</Text>
                     </GridItem>
+
                     <GridItem>
                       <Box mb={3}>
                         <Text fontWeight="bold">Temperature</Text>
-                        <Text>{`${period.temperature} ${period.temperatureUnit}`}</Text>
+                        <Text fontSize="lg">{`${period.temperature} ${period.temperatureUnit}`}</Text>
                       </Box>
                       <Box>
                         <Text fontWeight="bold">Wind</Text>
-                        <Text>{`${period.windSpeed} ${period.windDirection}`}</Text>
+                        <Text fontSize="lg">{`${period.windSpeed} ${period.windDirection}`}</Text>
                       </Box>
                     </GridItem>
                   </Grid>
-                ))}
-              </VStack>
-            </Container>
-          ) : (
+                );
+              })}
+            </VStack>
+          </Container>
+        ) : (
+          <Center>
             <Spinner size="xl" />
-          )}
-        </Box>
-      </Flex>
+          </Center>
+        )}
+      </GridItem>
 
-      <Flex justifyContent="center" flexShrink="0">
+      <GridItem as={Flex} justifyContent="center">
         <HStack spacing={10}>
           <Text>Developed by Joseph Oh</Text>
           <Link
@@ -206,8 +258,8 @@ function App() {
             Github Repository
           </Link>
         </HStack>
-      </Flex>
-    </Flex>
+      </GridItem>
+    </Grid>
   );
 }
 
