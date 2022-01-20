@@ -1,70 +1,24 @@
-# Getting Started with Create React App
+# Code Challenge for First Arriving
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Code challenge as a front-end developer.
+Tasked to create a basic, web-based digital dashboard that displays the weather forecast for the following day at the First Arriving office using the National Weather Service API.
+The forecast needed to be refreshed automatically once every 10 minutes.
 
-## Available Scripts
+Although the task said to just use the First Arriving Office location, I took it a step further and gave an input so any address within the US could be used. This was accomplished by using the geocoding API available by the US Census Bureau. This caused some issues due to CORS policy, so I had to actually make a small NodeJS backend to consume their API and return it to the front-end.
 
-In the project directory, you can run:
+So I guess shows both my front and back end skills.
 
-### `npm start`
+Dependencies used:
+- ReactJS
+- ChakraUI (component UI library)
+- Axios (HTTP Request library)
+- Luxon (DateTime library)
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## How to run
+Make sure you have NodeJS installed. I was using the latest LTS version (v16.13.1).
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+Go into the root directory and run `npm install`.
+Go into the `backend` directory and run `npm install`.
+Open a terminal in the `backend` directory and run `node app`. This will start the small backend server.
 
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Go back to the root directory and run `npm run start`, it should open the project in your browser where you can then interact with it.
