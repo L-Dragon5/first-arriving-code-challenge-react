@@ -2,12 +2,16 @@ import {
   Box,
   Container,
   Flex,
+  Grid,
+  GridItem,
   Heading,
   HStack,
+  Image,
   Input,
   Link,
   Spinner,
   Text,
+  VStack,
 } from '@chakra-ui/react';
 import axios from 'axios';
 import { DateTime } from 'luxon';
@@ -146,13 +150,46 @@ function App() {
           </form>
         </Container>
 
-        <Box>
+        <Box mt={6}>
           {!isLoading && forecastInfo ? (
-            <Box>
-              {forecastInfo.map((period) => (
-                <Box key={period.number}>{period.shortForecast}</Box>
-              ))}
-            </Box>
+            <Container maxW="container.lg">
+              <VStack alignItems="flex-start" spacing={5}>
+                {forecastInfo.map((period) => (
+                  <Grid
+                    key={period.number}
+                    templateColumns="0.35fr 1fr 0.25fr"
+                    gap={6}
+                    p={4}
+                    width="full"
+                    bgColor="gray.100"
+                    alignItems="center"
+                    borderRadius="sm"
+                  >
+                    <GridItem>
+                      <Text>
+                        {DateTime.fromISO(period.startTime).toLocaleString(
+                          DateTime.DATETIME_FULL,
+                        )}
+                      </Text>
+                    </GridItem>
+                    <GridItem as={HStack}>
+                      <Image src={period.icon} boxSize="84px" />
+                      <Text>{period.shortForecast}</Text>
+                    </GridItem>
+                    <GridItem>
+                      <Box mb={3}>
+                        <Text fontWeight="bold">Temperature</Text>
+                        <Text>{`${period.temperature} ${period.temperatureUnit}`}</Text>
+                      </Box>
+                      <Box>
+                        <Text fontWeight="bold">Wind</Text>
+                        <Text>{`${period.windSpeed} ${period.windDirection}`}</Text>
+                      </Box>
+                    </GridItem>
+                  </Grid>
+                ))}
+              </VStack>
+            </Container>
           ) : (
             <Spinner size="xl" />
           )}
