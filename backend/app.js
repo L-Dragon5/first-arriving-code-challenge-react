@@ -12,8 +12,12 @@ app.get('/', (req, res) => {
   res.send('Hello!');
 });
 
-// POST route to get forecast based on address input.
-app.post('/getForecast', (req, res) => {
+/**
+ * POST route to get forecast based on address input.
+ *
+ * @param address   one line address
+ */
+app.post('/getCoordinates', (req, res) => {
   const { address } = req.body;
 
   // Check to make sure data sent is not undefined or empty.
@@ -33,24 +37,22 @@ app.post('/getForecast', (req, res) => {
         const { data } = response;
         const { x, y } = data.result.addressMatches[0].coordinates;
 
-        console.log(x, y);
+        res.status(200).json({
+          latitude: y,
+          longitude: x,
+        });
       })
       .catch((error) => {
         console.log(error);
-        res.status(400).send({
+        res.status(400).json({
           message: 'Something went wrong trying to geocode address.',
         });
       });
-
-    // TODO: Get closest weather office using '/points'
-    // TODO: Get forecast based on wather office with '/gridpoints'
   } else {
-    res.status(400).send({
+    res.status(400).json({
       message: 'Address input is incorrect!',
     });
   }
-
-  res.sendStatus(200);
 });
 
 // Node server will listen on port 3001.
