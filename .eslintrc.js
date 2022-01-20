@@ -1,0 +1,41 @@
+module.exports = {
+  parserOptions: {
+    ecmaVersion: 2020,
+  },
+  extends: ['airbnb', 'plugin:prettier/recommended'],
+  env: {
+    browser: true,
+    commonjs: true,
+    es6: true,
+    jest: true,
+    node: true,
+  },
+  plugins: ['simple-import-sort'],
+  rules: {
+    'jsx-a11y/href-no-hash': ['off'],
+    'react/jsx-filename-extension': ['warn', { extensions: ['.js', '.jsx'] }],
+    'max-len': [
+      'warn',
+      {
+        code: 80,
+        tabWidth: 2,
+        comments: 80,
+        ignoreComments: false,
+        ignoreTrailingComments: true,
+        ignoreUrls: true,
+        ignoreStrings: true,
+        ignoreTemplateLiterals: true,
+        ignoreRegExpLiterals: true,
+      },
+    ],
+    'import/no-extraneous-dependencies': 'off',
+    'import/no-dynamic-require': 'off',
+    'global-require': 'off',
+    'no-console': 'off',
+    'react/jsx-props-no-spreading': 'off',
+    'react/function-component-definition': 'off',
+    'simple-import-sort/imports': 'error',
+    'simple-import-sort/exports': 'error',
+    'react/no-unstable-nested-components': 'off',
+  },
+};
