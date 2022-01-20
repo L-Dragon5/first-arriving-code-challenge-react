@@ -1,12 +1,15 @@
 import {
+  Box,
   Container,
   Flex,
   Heading,
   HStack,
   Input,
   Link,
+  Spinner,
   Text,
 } from '@chakra-ui/react';
+import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 
 function App() {
@@ -19,8 +22,15 @@ function App() {
   const [forecast, setForecast] = useState(null);
   */
 
+  // TODO: Submit address for geocoding and retrieve longitude/latitude coords.
   const submitAddress = (e) => {
     e.preventDefault();
+
+    axios
+      .post('http://localhost:3001/getForecast', {
+        address: addressInput,
+      })
+      .then((response) => console.log(response));
   };
 
   // Fetch data from API.
@@ -43,6 +53,10 @@ function App() {
             />
           </form>
         </Container>
+
+        <Box>
+          <Spinner size="xl" />
+        </Box>
       </Flex>
 
       <Flex justifyContent="center" flexShrink="0">
